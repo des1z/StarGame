@@ -1,10 +1,17 @@
 package ru.geekbrains.stargame.base;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 
 public class Base2DScreen implements Screen, InputProcessor {
+
+    private final Game game;
+
+    public Base2DScreen(Game game) {
+        this.game = game;
+    }
 
     @Override
     public void show() {
