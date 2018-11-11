@@ -3,62 +3,76 @@ package ru.geekbrains.stargame.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.geekbrains.stargame.Sprite.Background;
+import ru.geekbrains.stargame.Sprite.Star;
 import ru.geekbrains.stargame.base.Base2DScreen;
+import ru.geekbrains.stargame.math.Rect;
+
+
 
 public class MenuScreen extends Base2DScreen {
-
-    private SpriteBatch batch;
-    private Texture img;
-
-    private Vector2 pos;
-    private Vector2 v;
-    private Vector2 touch;
-    private Vector2 temp;
+    private static final int STAR_COUNT = 256;
+    private Texture bgTexture;
+    private Background background;
+    private TextureAtlas textureAtlas;
+    private Star[] stars;
 
     @Override
     public void show() {
         super.show();
-        batch = new SpriteBatch();
-        img = new Texture("badlogic.jpg");
-        pos = new Vector2(0,0);
-        v = new Vector2(0f,0f);
-        touch = new Vector2(0f,0f);
-        temp = new Vector2(0f,0f);
+        bgTexture = new Texture("bg.png");
+        background = new Background(new TextureRegion(bgTexture));
+        textureAtlas = new TextureAtlas("menuAtlas.tpack");
+        stars =new Star[STAR_COUNT];
+        for (int i = 0; i < stars.length; i++) {
+            stars[i] = new Star(textureAtlas);
+        }
     }
-
     @Override
     public void render(float delta) {
         super.render(delta);
-        Gdx.gl.glClearColor(0.19f, 0.43f, 0.2f, 1);
+        update(delta);
+        draw();
+    }
+
+    public void update(float delta) {
+        for (int i = 0; i < stars.length; i++) {
+            stars[i].update(delta);
+        }
+    }
+
+    public void draw() {
+        Gdx.gl.glClearColor(0.128f, 0.53f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw(img, pos.x, pos.y);
+        background.draw(batch);
+        for (int i = 0; i < stars.length; i++) {
+            stars[i].draw(batch);
+        }
         batch.end();
+    }
 
-        temp.set(touch);
-        if(temp.sub(pos).len() >0.5f){
-            pos.add(v);
-        }else{
-            pos.set(touch);
+    @Override
+    public void resize(Rect worldBounds) {
+        background.resize(worldBounds);
+        for (int i = 0; i < stars.length; i++) {
+            stars[i].resize(worldBounds);
         }
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        img.dispose();
+        bgTexture.dispose();
+        textureAtlas.dispose();
         super.dispose();
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        touch.set(screenX, Gdx.graphics.getHeight() - screenY);
-        v.set(touch.cpy().sub(pos).setLength(0.5f));
-
-        return super.touchDown(screenX, screenY, pointer, button);
+    public boolean touchDown(Vector2 touch, int pointer) {
+        return false;
     }
 }
-
